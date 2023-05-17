@@ -98,4 +98,26 @@ const getCountry = function (country) {
   });
 };
 
-getCountry('german');
+// getCountry('german');
+
+//Oldschool requesting
+// const request = new XMLHttpRequest();
+
+// request.open('GET', `https://restcountries.com/v3.1/name/${country}`);
+// request.send();
+
+////////////////////////////////////////
+//Modern way:
+////////////////////////////////////////
+
+// const fetchRequest = fetch('https://restcountries.com/v3.1/name/poland');
+
+// console.log(fetchRequest);
+
+const fetchGetCountry = function (country) {
+  fetch(`https://restcountries.com/v3.1/name/${country}`)
+    .then(response => response.json())
+    .then(data => renderCountry(data[0]));
+};
+
+fetchGetCountry('poland');
