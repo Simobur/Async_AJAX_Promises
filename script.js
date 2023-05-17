@@ -44,7 +44,7 @@ getCountry('german');*/
 
 ////////////////////////////////////
 ////////////////////////////////////
-
+/*
 const renderCountry = function (data, nClass) {
   const currencies = [data.currencies][0];
   const languages = [data.languages][0];
@@ -198,3 +198,29 @@ const fetchGetCountry = function (country) {
       countriesContainer.style.opacity = 1;
     });
 };
+*/
+
+////////////////////////////////////////
+////////////////////////////////////////
+//Coding challange://///////////////////
+////////////////////////////////////////
+////////////////////////////////////////
+
+const lat = 14;
+const lng = 7;
+let country;
+
+const whereAmI = function (lat, lng) {
+  fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`)
+    .then(response => {
+      // console.log(response.ok);
+      //   if (!response.ok) return;
+      return response.json();
+    })
+    .then(data => {
+      country = data.address.country;
+    })
+    .catch(err => console.error(`Cannot load current location (${err})`));
+};
+
+whereAmI(52.08, 13.381);
