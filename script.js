@@ -205,7 +205,7 @@ const fetchGetCountry = function (country) {
 //Coding challange://///////////////////
 ////////////////////////////////////////
 ////////////////////////////////////////
-
+/*
 const lat = 14;
 const lng = 7;
 let country;
@@ -224,3 +224,160 @@ const whereAmI = function (lat, lng) {
 };
 
 whereAmI(52.08, 13.381);
+*/
+/*
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery is start!');
+
+  setTimeout(function () {
+    if (Math.random() >= 0.5) {
+      resolve('You WIN 💰');
+    } else {
+      reject(new Error('You lose your money 💩'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+const wait = seconds =>
+  new Promise(    resolve => setTimeout(resolve, seconds * 1000));
+
+// wait(2)
+//   .then(res => {
+//     console.log('Wait 2 seconds');
+//     return wait(3);
+//   })
+//   .then(res => {
+//     console.log('wait 3 sec');
+//     return wait(2);
+//   })
+//   .then(res => {
+//     console.log('Wait 5 sec');
+//   });
+
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject('abc').catch(x => console.error(new Error(x)));
+
+// navigator.geolocation.getCurrentPosition(
+//   function (position) {
+//     console.log(position);
+//   },
+//   function (err) {
+//     console.log(err);
+//   }
+// );
+
+const position = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      // position => resolve(position),
+      // err => reject(err)
+      resolve,
+      reject
+    );
+  });
+};
+
+console.log(position().then(res => console.log(res.coords)));
+*/
+/*
+Build the image loading functionality that I just showed you on the screen.
+
+Tasks are not super-descriptive this time, so that you can figure out some stuff on your own. Pretend you're working on your own 😉
+
+PART 1
+1. Create a function 'createImage' which receives imgPath as an input. This function returns a promise which creates a new image (use document.createElement('img')) and sets the .src attribute to the provided image path. When the image is done loading, append it to the DOM element with the 'images' class, and resolve the promise. The fulfilled value should be the image element itself. In case there is an error loading the image ('error' event), reject the promise.
+
+If this part is too tricky for you, just watch the first part of the solution.
+
+PART 2
+2. Comsume the promise using .then and also add an error handler;
+3. After the image has loaded, pause execution for 2 seconds using the wait function we created earlier;
+4. After the 2 seconds have passed, hide the current image (set display to 'none'), and load a second image (HINT: Use the image element returned by the createImage promise to hide the current image. You will need a global variable for that 😉);
+5. After the second image has loaded, pause execution for 2 seconds again;
+6. After the 2 seconds have passed, hide the current image.
+
+TEST DATA: Images in the img folder. Test the error handler by passing a wrong image path. Set the network speed to 'Fast 3G' in the dev tools Network tab, otherwise images load too fast.
+
+GOOD LUCK 😀*/
+
+const img1 = 'img/img-1.jpg';
+const img2 = 'img/img-2.jpg';
+const img3 = 'img/img-3.jpg';
+let currImg;
+
+const image = document.querySelector('.image');
+const imagesContainer = document.querySelector('.images');
+
+const wait = seconds =>
+  new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+const createImage = imgSrc => {
+  return new Promise(function (resolve, reject) {
+    console.log('Image is loading');
+    const image = document.createElement('img');
+    image.src = imgSrc;
+
+    image.addEventListener('load', function () {
+      console.log('Image loaded! 👍');
+      imagesContainer.append(image);
+      resolve(image);
+    });
+    image.addEventListener('error', function () {
+      reject(new Error('Something goes wrong!'));
+    });
+  });
+};
+
+createImage(img1)
+  .then(res => {
+    currImg = res;
+    return wait(2);
+  })
+  .then(res => {
+    currImg.style.display = 'none';
+    return createImage(img2);
+  })
+  .then(res => {
+    currImg = res;
+    return wait(2);
+  })
+  .then(res => {
+    currImg.style.display = 'none';
+    return createImage(img3);
+  })
+  .catch(err => console.error(err));
+
+// {
+//   recieved((image.src = imgSrc));
+//   reject(new Error('Count load image'));
+// }
+
+// createImage(img2).then(rel => {
+//   console.log(rel);
+// });
+//   return createImage(img2);
+// })
+// .then(rel => {
+//   console.log(rel);
+//   return createImage(img3);
+// })
+// .then(rel => console.log(rel))
+// .catch(err => console.error(err));
+
+/*const wait = seconds =>
+  new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+// wait(2)
+//   .then(res => {
+//     console.log('Wait 2 seconds');
+//     return wait(3);
+//   })
+//   .then(res => {
+//     console.log('wait 3 sec');
+//     return wait(2);
+//   })
+//   .then(res => {
+//     console.log('Wait 5 sec');
+//   });*/
