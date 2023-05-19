@@ -599,7 +599,7 @@ const loadImage = function (imageSrc) {
 const imgArr = [img1, img2, img3];
 
 const loadNPause = async function (arr) {
-  let image = await loadImage(arr[2]);
+  let image = await loadImage(arr[0]);
   await console.log(image);
   await wait(2);
   // img.style.display = 'none';
