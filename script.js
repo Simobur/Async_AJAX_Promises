@@ -484,10 +484,10 @@ const whereAmI = async function () {
   }
 };
 
-let data;
-whereAmI().then(city => console.log(city));
-console.log(data);
-console.log('after');
+// let data;
+// whereAmI().then(city => console.log(city));
+// console.log(data);
+// console.log('after');
 
 (async function () {
   try {
@@ -524,4 +524,93 @@ const get3Countries = async function (c1, c2, c3) {
   }
 };
 
-get3Countries('germany', 'poland', 'usa');
+// get3Countries('germany', 'poland', 'usa');
+
+/////////////////////
+//Promise.race
+
+(async function () {
+  const winner = await Promise.race([
+    getJSON(`https://restcountries.com/v3.1/name/poland`),
+    getJSON(`https://restcountries.com/v3.1/name/germany`),
+    getJSON(`https://restcountries.com/v3.1/name/usa`),
+  ]);
+  console.log(winner[0].name.common);
+})();
+
+const timeout = function (s) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('Internet is too slow!'));
+    }, s * 1000);
+  });
+};
+
+Promise.race([
+  timeout(5),
+  getJSON(`https://restcountries.com/v3.1/name/germany`),
+])
+  .then(res => console.log(res[0].name.common))
+  .catch(err => console.error(err.message));
+
+/////////////////////
+//Promise.allSettled
+
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+
+/////////////////////
+//Promise.any  [ES2021]
+// return first Fullfield resoult
+
+Promise.any([
+  Promise.resolve('1 Success'),
+  Promise.resolve('Another Success'),
+  Promise.reject('Error'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+
+const wait = seconds =>
+  new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+const img1 = 'img/img-1.jpg';
+const img2 = 'img/img-2.jpg';
+const img3 = 'img/img-3.jpg';
+
+const loadImage = function (imageSrc) {
+  let img = document.createElement('img');
+  img.src = imageSrc;
+
+  img.addEventListener('load', function () {
+    const imagesContainer = document.querySelector('.images');
+    imagesContainer.append(img);
+    return img;
+  });
+
+  img.addEventListener('error', new Error('Something goes wrong! '));
+};
+
+const imgArr = [img1, img2, img3];
+
+const loadNPause = async function (arr) {
+  let image = await loadImage(arr[2]);
+  await console.log(image);
+  await wait(2);
+  // img.style.display = 'none';
+  image = await loadImage(arr[1]);
+  await wait(2);
+  console.log(image);
+  // image.style.display = 'none';
+  image = await loadImage(arr[2]);
+  await wait(2);
+  console.log(image);
+  // img.style.display = 'none';
+};
+
+loadNPause(imgArr);
