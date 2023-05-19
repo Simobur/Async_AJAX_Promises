@@ -301,7 +301,7 @@ PART 2
 TEST DATA: Images in the img folder. Test the error handler by passing a wrong image path. Set the network speed to 'Fast 3G' in the dev tools Network tab, otherwise images load too fast.
 
 GOOD LUCK 😀*/
-
+/*
 const img1 = 'img/img-1.jpg';
 const img2 = 'img/img-2.jpg';
 const img3 = 'img/img-3.jpg';
@@ -322,7 +322,8 @@ const createImage = imgSrc => {
     image.addEventListener('load', function () {
       console.log('Image loaded! 👍');
       imagesContainer.append(image);
-      resolve(image);
+      resolve({ image, description: 'dip' });
+      console.log('Dupa');
     });
     image.addEventListener('error', function () {
       reject(new Error('Something goes wrong!'));
@@ -332,10 +333,11 @@ const createImage = imgSrc => {
 
 createImage(img1)
   .then(res => {
-    currImg = res;
+    currImg = res.image;
+    console.log(res.description);
     return wait(2);
   })
-  .then(res => {
+  .then(() => {
     currImg.style.display = 'none';
     return createImage(img2);
   })
@@ -343,7 +345,7 @@ createImage(img1)
     currImg = res;
     return wait(2);
   })
-  .then(res => {
+  .then(() => {
     currImg.style.display = 'none';
     return createImage(img3);
   })
@@ -381,3 +383,145 @@ createImage(img1)
 //   .then(res => {
 //     console.log('Wait 5 sec');
 //   });*/
+const renderCountry = function (data) {
+  const currencies = [data.currencies][0];
+  const languages = [data.languages][0];
+
+  const html = `
+<article class="country">
+<img class="country__img" src="${data.flags.png}" />
+<div class="country__data">
+<h3 class="country__name">${data.name.common}</h3>
+<h4 class="country__region">${data.region}</h4>
+<p class="country__row"><span>👫</span>${(+data.population / 1000000).toFixed(
+    0
+  )}mln people</p>
+<p class="country__row"><span>🗣️</span>${Object.values(languages)[0]}</p>
+<p class="country__row"><span>💰</span>${Object.values(currencies)[0].name}</p>
+</div>
+</article>`;
+
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// const whereAmI = function (lat, lng) {
+//   fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`)
+//     .then(response => {
+//       // console.log(response.ok);
+//       //   if (!response.ok) return;
+//       return response.json();
+//     })
+//     .then(data => {
+//       country = data.address.country;
+//     })
+//     .catch(err => console.error(`Cannot load current location (${err})`));
+// };
+
+// const geocode = function (lat,lng){
+//  const data = await fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`);
+// console.log(data);
+// }
+/*
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  const positon = await getPosition();
+  const lat = positon.coords.latitude;
+  const lng = positon.coords.longitude;
+
+  const geocode = await fetch(
+    `https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`
+  );
+  const dataG = await geocode.json();
+
+  // fetch(`https://restcountries.com/v3.1/name/${country}`).then(res => console.log(res));
+
+  const loc = await fetch(
+    `https://restcountries.com/v3.1/name/${dataG.address.country}`
+  );
+  const data = await loc.json();
+  renderCountry(data[0]);
+};
+
+whereAmI();
+*/
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  try {
+    const positon = await getPosition();
+    const lat = positon.coords.latitude;
+    const lng = positon.coords.longitude;
+
+    const geocode = await fetch(
+      `https://geocode.maps.co/reverse?lat=${lat}&lon=${lng}`
+    );
+    if (!geocode.ok) throw new Error('Problem with get position');
+
+    const dataG = await geocode.json();
+
+    // fetch(`https://restcountries.com/v3.1/name/${country}`).then(res => console.log(res));
+
+    const loc = await fetch(
+      `https://restcountries.com/v3.1/name/${dataG.address.country}`
+    );
+    if (!loc.ok) throw new Error('Problem with get country');
+    const data = await loc.json();
+    renderCountry(data[0]);
+    return `Your position is rendered`;
+  } catch (err) {
+    console.error(`${err} 💥💥💥`);
+  }
+};
+
+let data;
+whereAmI().then(city => console.log(city));
+console.log(data);
+console.log('after');
+
+(async function () {
+  try {
+    const city = await whereAmI();
+    console.log(city);
+  } catch {}
+})();
+
+const getJSON = function (url, errMess = 'Something goes wrong!') {
+  return fetch(url).then(response => {
+    if (!response.ok) {
+      throw new Error(`${errMess} (${response.status})`);
+    }
+    return response.json();
+  });
+};
+
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
+    const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    console.log(data1.capital, data2.capital, data3.capital);
+
+    const data = await Promise.all([
+      getJSON(`https://restcountries.com/v3.1/name/${c1}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c2}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c3}`),
+    ]);
+
+    console.log(data.map(d => d[0].capital[0]));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+get3Countries('germany', 'poland', 'usa');
